@@ -1,0 +1,49 @@
+{
+  "project_info": {
+    "project_number": "1069551256289",
+    "firebase_url": "https://chat-app-82104-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "chat-app-82104",
+    "storage_bucket": "chat-app-82104.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1069551256289:android:45ebb0df2a808a84636da0",
+        "android_client_info": {
+          "package_name": "com.codzoc.chatApp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBs8gVCDQrm3XwCs9VkHzkWfIAhY4aWaRk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1069551256289:android:a9e1691cb5e7aba3636da0",
+        "android_client_info": {
+          "package_name": "com.company.chat"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBs8gVCDQrm3XwCs9VkHzkWfIAhY4aWaRk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
