@@ -1,4 +1,3 @@
-
 import 'package:chat_app/Screens/home_screen.dart';
 import 'package:chat_app/Screens/userDetails_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -83,15 +82,15 @@ class _LoginScreenState extends State<LoginScreen> {
           setState(() => _isLoading = false);
           _showErrorSnackBar(message: ex.message ?? 'Verification failed');
         },
-        codeSent: (String verificationid, int? resendtoken) {
+        codeSent: (String verificationId, int? resendToken) {
           _loadingTimer?.cancel();
-          _verificationId = verificationid;
+          _verificationId = verificationId;
           setState(() {
             _isLoading = false;
             _otpVisible = true;
           });
         },
-        codeAutoRetrievalTimeout: (String verificationid) {
+        codeAutoRetrievalTimeout: (String verificationId) {
           _loadingTimer?.cancel();
           setState(() => _isLoading = false);
         },
@@ -197,28 +196,13 @@ class _LoginScreenState extends State<LoginScreen> {
             end: Alignment.center,
             colors: [
               SecondaryBlue,
-             PrimaryBlue
+              PrimaryBlue
             ],
           ),
         ),
         child: SafeArea(
           child: Stack(
             children: [
-              // Background logo watermark
-              // Positioned.fill(
-              //   child: Opacity(
-              //     opacity: 0.2, // Set opacity to 20%
-              //     child: Align(
-              //       alignment: Alignment.center,
-              //       child: Image.asset(
-              //         'assets/logo.png', // Path to your logo image
-              //         height: 200, // Adjust the size of the logo
-              //         width: 200, // Adjust the size of the logo
-              //         fit: BoxFit.contain, // Make sure the logo scales properly
-              //       ),
-              //     ),
-              //   ),
-              // ),
               Column(
                 children: [
                   Expanded(
@@ -229,7 +213,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                           Text(
+                          Text(
                             'WingChat',
                             style: TextStyle(
                               color: White,
@@ -302,15 +286,6 @@ class _LoginScreenState extends State<LoginScreen> {
                                     }
                                   });
                                 },
-                                validator: (phone) {
-                                  if (phone?.countryCode == '+91') {
-                                    if (!_validateIndianPhoneNumber(
-                                        phone?.number ?? '')) {
-                                      return 'Please enter a valid Indian phone number';
-                                    }
-                                  }
-                                  return null;
-                                },
                               ),
                             ),
                             const SizedBox(height: 20),
@@ -382,3 +357,4 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 }
+

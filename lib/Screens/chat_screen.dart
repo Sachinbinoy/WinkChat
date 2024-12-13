@@ -4,20 +4,22 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:intl/intl.dart'; // Import the intl package
+import 'package:intl/intl.dart';
 
 class ChatScreen extends StatefulWidget {
-  final User? currentUser;
+  final User currentUser;
   final String recipientId;
   final String recipientName;
-  final VoidCallback onMessagesRead; // Callback to mark messages as read
+  final String? recipientProfilePictureUrl; // Add this
+  final VoidCallback onMessagesRead;
 
   const ChatScreen({
     super.key,
     required this.currentUser,
     required this.recipientId,
     required this.recipientName,
-    required this.onMessagesRead, // Added here
+    required this.onMessagesRead,
+    this.recipientProfilePictureUrl,
   });
 
   @override
@@ -27,14 +29,13 @@ class ChatScreen extends StatefulWidget {
 class _ChatScreenState extends State<ChatScreen> {
   final TextEditingController _messageController = TextEditingController();
   late String chatRoomId;
-  String? recipientProfilePictureUrl; // To store the profile picture URL
 
   @override
   void initState() {
     super.initState();
-    chatRoomId = _getChatRoomId(widget.currentUser!.uid, widget.recipientId);
+    chatRoomId = _getChatRoomId(widget.currentUser.uid, widget.recipientId);
     _markMessagesAsRead();
-    _fetchRecipientProfilePicture(); // Fetch the profile picture URL
+    // _fetchRecipientProfilePicture(); 
   }
 
   // Helper to create chat room ID based on user IDs
@@ -45,21 +46,21 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   // Fetch the recipient's profile picture URL or file path
-  Future<void> _fetchRecipientProfilePicture() async {
-    final doc = await FirebaseFirestore.instance
-        .collection('users')
-        .doc(widget.recipientId)
-        .get();
+  // Future<void> _fetchRecipientProfilePicture() async {
+  //   final doc = await FirebaseFirestore.instance
+  //       .collection('users')
+  //       .doc(widget.recipientId)
+  //       .get();
 
-    if (doc.exists) {
-      if (kDebugMode) {
-        print("profile_picture==${doc['profile_picture']}");
-      }
-      setState(() {
-        recipientProfilePictureUrl = doc['profile_picture'];
-      });
-    }
-  }
+  //   if (doc.exists) {
+  //     if (kDebugMode) {
+  //       print("profile_picture==${doc['profile_picture']}");
+  //     }
+  //     setState(() {
+  //       recipientProfilePictureUrl = doc['profile_picture'];
+  //     });
+  //   }
+  // }
 
   // Mark all messages from the recipient as read
   Future<void> _markMessagesAsRead() async {
@@ -88,7 +89,7 @@ class _ChatScreenState extends State<ChatScreen> {
           .collection('messages')
           .add({
         'text': _messageController.text,
-        'senderId': widget.currentUser!.uid,
+        'senderId': widget.currentUser.uid,
         'recipientId': widget.recipientId,
         'timestamp': FieldValue.serverTimestamp(), // Ensure server timestamp
         'read': false,
@@ -134,16 +135,16 @@ class _ChatScreenState extends State<ChatScreen> {
             children: [
               // Profile Picture
               CircleAvatar(
-                backgroundImage: recipientProfilePictureUrl != null
-                    ? FileImage(File(recipientProfilePictureUrl!))
+                backgroundImage: widget.recipientProfilePictureUrl != null
+                    ? FileImage(File(widget.recipientProfilePictureUrl!))
                     : null,
                 radius: 15,
-                child: recipientProfilePictureUrl == null
+                child: widget.recipientProfilePictureUrl == null
                     ? Text(
                         widget.recipientName[0].toUpperCase(),
                         style: TextStyle(
                           fontSize: 20,
-                          color:Grey,
+                          color: Grey,
                         ),
                       )
                     : null,
@@ -167,7 +168,7 @@ class _ChatScreenState extends State<ChatScreen> {
         ),
       ),
       body: Container(
-        color:  White,
+        color: White,
         child: Column(
           children: [
             Expanded(
@@ -179,20 +180,27 @@ class _ChatScreenState extends State<ChatScreen> {
                     .orderBy('timestamp', descending: true)
                     .snapshots(),
                 builder: (context, snapshot) {
-                  if (!snapshot.hasData) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    // If the stream is still waiting for data, show the loading spinner
                     return const Center(child: CircularProgressIndicator());
                   }
+
+                  if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                    // If no data or documents exist, stop loading and show a message
+                    return const Center(child: Text("No messages yet"));
+                  }
+
+                  // If there is data, show the list of messages
                   final messages = snapshot.data!.docs;
                   return ListView.builder(
-                    reverse: true,
+                    reverse: true, // to show the most recent message at the bottom
                     itemCount: messages.length,
                     itemBuilder: (context, index) {
                       final message = messages[index];
                       final isSentByCurrentUser =
-                          message['senderId'] == widget.currentUser!.uid;
-                      final timestamp = message['timestamp']
-                          as Timestamp?; // Safely cast to Timestamp
-        
+                          message['senderId'] == widget.currentUser.uid;
+                      final timestamp = message['timestamp'] as Timestamp?;
+
                       return Padding(
                         padding: const EdgeInsets.symmetric(vertical: 8.0),
                         child: Align(
@@ -264,7 +272,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       ),
                       child: TextField(
                         controller: _messageController,
-                        decoration:  InputDecoration(
+                        decoration: InputDecoration(
                           hintText: 'Send a message...',
                           border: InputBorder.none,
                           hintStyle: TextStyle(color: Grey),
@@ -290,7 +298,7 @@ class _ChatScreenState extends State<ChatScreen> {
                           ),
                         ],
                       ),
-                      child:  Icon(
+                      child: Icon(
                         Icons.send,
                         color: White,
                         size: 24,
@@ -299,7 +307,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   ),
                 ],
               ),
-            )
+            ),
           ],
         ),
       ),
